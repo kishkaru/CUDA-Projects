@@ -1,0 +1,66 @@
+CPU = host
+GPU = device (coprocessor)
+
+Stream: data w/ similar computation
+Kernel: function applied to stream
+
+1) allocating memory = cudaMalloc
+1.5) zero memory = cudaMemset
+2) moving data = cudaMemcpy
+3) host "launches" kernels in the device.
+4) cudaMemcpy
+4.5) deviceSynchronize:  __syncthreads()
+
+++ good at Map()
++ good at launching a lot of threads
++ good at running a lot of threads in parallel
+
+
+"declaration specifier" for __global__
+
+nvcc -o first first.cu  -> CUDA to PTX -> binary (via graphics driver)
+./first
+
+kernel<<<gridOfBlocks, blockOfThreads>>>()
+kernel<<<numBlocks, threadsPerBlock>>>()
+
+512 threads/block for older GPUs
+1024 threads/block for new GPUs
+(should be multiple of 32; (64+))
+
+When determining the block and grid size, you need to consider:
+
+how big your problem is & how can you split it
+how many multiprocessors you have & how many blocks will you have per multiprocessor
+what are your GPU's limits of threads-per-block and threads-per-multiprocessor.
+
+kernel<<<1,64>>>() == kernel<<<dim3(1,1,1), dim3(64,1,1), shared blocks>>>
+
+threadIdx.x
+threadIdx.y
+threadIdx.z
+blockDim
+
+blockIdx.x
+blockIdx.y
+blockIdx.z
+gridDim
+
+
+Map
+Gather
+Scatter
+Stencil (2D von Neumann)
+Transpose (AoS, SoA)
+
+Local memory = 512KB/thread
+Shared memory = 48KB/block
+Global
+Host memory
+
+coalesced (contiguous mem locations) vs. strided
+
+atomicAdd(ptr deviceMem, amountToAdd)
+atomicMin()
+atomicXOR()
+atomicCAS() : compare&swap
